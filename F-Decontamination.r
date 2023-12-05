@@ -21,31 +21,16 @@ library(microbiomeutilities)
 set.seed(16818)
 
 # Samples with read count per ASV without normalization ----
-ASV_qza <- read_qza("PQ00193_FFPE/FFPE_All/ASV/dada2table_All.qza")
+ASV_table <- read.qza(dada2table_All.qza")
 ASV_matrix <- ASV_qza$data
 ASV_matrix <- as.data.frame(ASV_matrix)
 
-samples_metadata <- read.table("PQ00193_FFPE/manifest_files/FFPE_All.tsv", sep = '\t', header = T)
+samples_metadata <- read.table(".../files/FFPE_All.tsv", sep = '\t', header = T)
 names(ASV_matrix) <- samples_metadata$feature.type.number[match(names(ASV_matrix), samples_metadata$sample.id)]
 
 # Reorder file for microdecon: ASV_id, blanks/controls, Samples(ordered per group), taxa. ----
 ASV_matrix <- select(ASV_matrix, "Blanc", "Control", 
-                     "AD differentiated 1", "AD differentiated 2", "AD differentiated 3", "AD differentiated 4", "AD differentiated 5", "AD differentiated 6", "AD differentiated 7", "AD differentiated 8", "AD differentiated 9", "AD differentiated 10",
-                     "AD differentiated 11", "AD differentiated 12", "AD differentiated 13", "AD differentiated 14", "AD differentiated 15","AD differentiated 16", "AD differentiated 17", "AD differentiated 18", "AD differentiated 19", "AD differentiated 20",
-                     "AD differentiated 21", "AD differentiated 22", "AD differentiated 23", "AD differentiated 24", "AD differentiated 25","AD differentiated 26", "AD differentiated 27", "AD differentiated 28", "AD differentiated 29", "AD differentiated 30",
-                     "AD undifferentiated 1", "AD undifferentiated 2", "AD undifferentiated 3","AD undifferentiated 4", "AD undifferentiated 5", "AD undifferentiated 6", "AD undifferentiated 7","AD undifferentiated 8", "AD undifferentiated 9", "AD undifferentiated 10", 
-                     "AD undifferentiated 11","AD undifferentiated 12", "AD undifferentiated 13", "AD undifferentiated 14", "AD undifferentiated 15","AD undifferentiated 16",
-                     "SQ differentiated 1", "SQ differentiated 2", "SQ differentiated 3", "SQ differentiated 4", "SQ differentiated 5", "SQ differentiated 6", "SQ differentiated 7", "SQ differentiated 8", "SQ differentiated 9", "SQ differentiated 10",
-                     "SQ differentiated 11", "SQ differentiated 12", "SQ differentiated 13", "SQ differentiated 14", "SQ differentiated 15","SQ differentiated 16", "SQ differentiated 17", "SQ differentiated 18", "SQ differentiated 19", "SQ differentiated 20",
-                     "SQ differentiated 21", "SQ differentiated 22", "SQ differentiated 23", "SQ differentiated 24", "SQ differentiated 25","SQ differentiated 26", "SQ differentiated 27", "SQ differentiated 28", "SQ differentiated 29", "SQ differentiated 30",
-                     "SQ differentiated 31", "SQ differentiated 32", "SQ differentiated 33", "SQ differentiated 34", "SQ differentiated 35","SQ differentiated 36",
-                     "SQ undifferentiated 1", "SQ undifferentiated 2", "SQ undifferentiated 3","SQ undifferentiated 4", "SQ undifferentiated 5", "SQ undifferentiated 6", "SQ undifferentiated 7","SQ undifferentiated 8", "SQ undifferentiated 9", "SQ undifferentiated 10", 
-                     "SQ undifferentiated 11","SQ undifferentiated 12", "SQ undifferentiated 13", "SQ undifferentiated 14", "SQ undifferentiated 15","SQ undifferentiated 16", "SQ undifferentiated 17","SQ undifferentiated 18", "SQ undifferentiated 19","SQ undifferentiated 20",
-                     "LCLC 1", "LCLC 2", "LCLC 3", 
-                     "SCLC 1", "SCLC 2", "SCLC 3", "SCLC 4", "SCLC 5", "SCLC 6", "SCLC 7", "SCLC 8", "SCLC 9", "SCLC 10", "SCLC 11", "SCLC 12", "SCLC 13", "SCLC 14", "SCLC 15", "SCLC 16",
-                     "MET 1", "MET 2", "MET 3", "MET 4", "MET 5", "MET 6", "MET 7", "MET 8", "MET 9", "MET 10", "MET 11", "MET 12", "MET 13", "MET 14", "MET 15", "MET 16", "MET 17",  
-                     "Others 1", "Others 2", "Others 3", "Others 4", "Others 5", "Others 6", "Others 7", "Others 8", "Others 9",
-                     "NORMAL 1", "NORMAL 2", "NORMAL 3", "NORMAL 4", "NORMAL 5", "NORMAL 6","NORMAL 7", "NORMAL 8")
+                     "AD differentiated 1", "AD differentiated 2", "AD differentiated 3", ...)
 
 #File for microdecon, for put back the rownames as first col ----
 ASV_matrix <- rownames_to_column(ASV_matrix, var = "ASV_id") 
@@ -132,7 +117,7 @@ ps <- merge_phyloseq(ps, treeNJ, sequences)
 taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps))) #Change ASV names from dada2 format, to own names "ASV1 to ASVn"
 head(taxa_names(ps))
 saveRDS(ps, 'PQ00193_FFPE/phyloseq_obj/ps_decontam.rds') #For further use, to only load the phyloseq object
-ps <- readRDS("PQ00193_FFPE_LC/phyloseq_obj/ps_decontam.rds") #For further use, to load de rds file created containing the previously phyloseq object created
+ps <- readRDS(".../phyloseq_obj/ps_decontam.rds") #For further use, to load de rds file created containing the previously phyloseq object created
 
 
 # Filtering of samples and ASV regarding: reads, Bacteria, prevalence ----
@@ -184,342 +169,14 @@ tax_table(ps_4) <- gsub(" s__", "", tax_table(ps_4))
 tax_table(ps_4)
 
 #Remove samples from the same  patient and group, retain only 1 (the one with higher number of reads) ----
-ps_5 <- subset_samples(ps_4, !sample.id %in% c("McAllister_19_25_A_A2", "McAllister_19_39_A", "McAllister_19_39_B", 
-                                               "McAllister_19_8_A_A1", "McAllister_19_8_B_A5", "McAllister_20_1_A_A"))
+ps_5 <- subset_samples(ps_4, !sample.id %in% c("..", "..."))
 
-saveRDS(ps_5, 'PQ00193_FFPE_LC/phyloseq_obj/ps_decont_tax.rds') #For further use, to only load the phyloseq object
-ps_5 <- readRDS("PQ00193_FFPE_LC/phyloseq_obj/ps_decont_tax.rds") #For further use, to load de rds file created containing the previously phyloseq object created
+saveRDS(ps_5, '.../phyloseq_obj/ps_decont_tax.rds') #For further use, to only load the phyloseq object
+ps_5 <- readRDS(".../phyloseq_obj/ps_decont_tax.rds") #For further use, to load de rds file created containing the previously phyloseq object created
 sample_data(ps_5)
 
 #Filter 6/7, remove low frequency ASV. Remain ASV seen 1 time in at least 10% of the samples per pairwise or three group comparison. ----
 #First, we subset data and then, remove lower frequency ASV and remove samples with less than 1000 reads. 
 
 ps_ADSQ <- subset_samples(ps_5, subtype %in% c("AD", "SQ")) 
-ps_fADSQ <- prune_samples(sample_sums(ps_ADSQ) > 1000, ps_ADSQ) 
-saveRDS(ps_fADSQ, 'PQ00193_FFPE_LC/phyloseq_obj/ps_fADSQ.rds')
-with(sample_data(ps_fADSQ), table(subtype))
-
-ps_ADsmall <- subset_samples(ps_5, subtype %in% c("AD", "SCLC")) 
-ps_fADsmall <- prune_samples(sample_sums(ps_ADsmall) > 1000, ps_ADsmall) 
-saveRDS(ps_fADsmall, 'PQ00193_FFPE_LC/phyloseq_obj/ps_fADsmall.rds')
-with(sample_data(ps_fADsmall), table(subtype))
-
-ps_SQsmall <- subset_samples(ps_5, subtype %in% c("SQ", "SCLC")) 
-ps_fSQsmall <- prune_samples(sample_sums(ps_SQsmall) > 1000, ps_SQsmall) 
-saveRDS(ps_fSQsmall, 'PQ00193_FFPE_LC/phyloseq_obj/ps_fSQsmall.rds')
-with(sample_data(ps_fSQsmall), table(subtype))
-
-ps_ADSQsmall <- subset_samples(ps_5, subtype %in% c("AD", "SQ", "SCLC")) 
-ps_fADSQsmall <- prune_samples(sample_sums(ps_ADSQsmall) > 1000, ps_ADSQsmall) 
-saveRDS(ps_fADSQsmall, 'PQ00193_FFPE_LC/phyloseq_obj/ps_fADSQsmall.rds')
-with(sample_data(ps_fADSQsmall), table(subtype))
-
-ps_ADd <- subset_samples(ps_5, feature.type %in% c("AD differentiated", "AD undifferentiated"))
-ps_fADd <- prune_samples(sample_sums(ps_ADd) > 1000, ps_ADd) 
-saveRDS(ps_fADd, 'PQ00193_FFPE_LC/phyloseq_obj/ps_ADd.rds')
-with(sample_data(ps_fADd), table(feature.type))
-
-ps_ADnor <- subset_samples(ps_5, subtype %in% c("AD", "NORMAL")) 
-ps_fADnor <- prune_samples(sample_sums(ps_ADnor) > 1000, ps_ADnor) 
-saveRDS(ps_fADnor, 'PQ00193_FFPE_LC/phyloseq_obj/ps_fADnor.rds')
-with(sample_data(ps_fADnor), table(subtype))
-
-ps_SQd <- subset_samples(ps_5, feature.type %in% c("SQ differentiated", "SQ undifferentiated"))
-ps_fSQd <- prune_samples(sample_sums(ps_SQd) > 1000, ps_SQd) 
-saveRDS(ps_fSQd, 'PQ00193_FFPE_LC/phyloseq_obj/ps_SQd.rds')
-with(sample_data(ps_fSQd), table(feature.type))
-
-# Venn diagrams ----
-
-ps_ADSQ_small_nor <- subset_samples(ps_5, subtype %in% c("AD", "SQ", "SCLC", "NORMAL")) 
-ps_fADSQ_small_nor <- prune_samples(sample_sums(ps_ADSQ_small_nor) > 1000, ps_ADSQ_small_nor) 
-saveRDS(ps_fADSQ_small_nor, 'PQ00193_FFPE_LC/phyloseq_obj/ps_fADSQ_small_nor.rds')
-ps_fADSQ_small_nor <- readRDS("PQ00193_FFPE_LC/phyloseq_obj/ps_fADSQ_small_nor.rds")
-with(sample_data(ps_fADSQ_small_nor), table(subtype))
-with(sample_data(ps_fADSQ_small_nor), table(feature.type))
-
-pseq.rel <- microbiome::transform(ps_fADSQ_small_nor, "compositional")
-group_subtype <- unique(as.character(meta(pseq.rel)$subtype))
-group_feature.type <- unique(as.character(meta(pseq.rel)$feature.type))
-print(group_subtype)
-print(group_feature.type)
-
-pseq.rel.f <- format_to_besthit(pseq.rel)
-taxa_names(pseq.rel.f)[1:5]
-
-## ASV more than 0 of abundance (presence/absence) and present in at leats 1 sample ----
-
-list_core_subtype <- c() # an empty object to store information
-
-for (n in group_subtype){ # for each variable n in DiseaseState
-  ps.sub <- subset_samples(pseq.rel.f, subtype == n) # Choose sample from DiseaseState by n
-  core_m <- core_members(ps.sub, # ps.sub is phyloseq selected with only samples from g 
-                         detection = 0, 
-                         prevalence = 0) 
-  print(paste0("No. of core taxa in ", n, " : ", length(core_m))) # print core taxa identified in each DiseaseState.
-  list_core_subtype[[n]] <- core_m
-  } # add to a list core taxa for each group.
-
-print(list_core_subtype)
-
-list_core_feature.type <- c() # an empty object to store information
-
-for (n in group_feature.type){ # for each variable n in DiseaseState 
-  ps.sub <- subset_samples(pseq.rel.f, feature.type == n) # Choose sample from DiseaseState by n
-  core_m <- core_members(ps.sub, # ps.sub is phyloseq selected with only samples from g 
-                         detection = 0, 
-                         prevalence = 0)
-  print(paste0("No. of core taxa in ", n, " : ", length(core_m))) # print core taxa identified in each DiseaseState.
-  list_core_feature.type[[n]] <- core_m} # add to a list core taxa for each group.
-
-print(list_core_feature.type)
-
-mycols_subtype <- c("AD" ="#FF0000", "SQ" ="#00008B", "SCLC" = "#008B8B", "NORMAL" = "#32CD32")
-mycols_feature.type <- c("AD differentiated" ="#fc8d59", "AD undifferentiated" = "#fee090",
-                         "SQ differentiated" = "#74add1", "SQ undifferentiated" = "#abd9e9", 
-                         "SCLC" = "#008B8B", "NORMAL" = "#32CD32")
-
-list_ASV_subtype_all <- do.call(qpcR:::cbind.na, list_core_subtype)
-xlsx::write.xlsx(list_ASV_subtype_all, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "subtype_allshared")
-
-list_ASV_feature.type_all <- do.call(qpcR:::cbind.na, list_core_feature.type)
-xlsx::write.xlsx(list_ASV_feature.type_all, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "feature.type_allshared", append = TRUE)
-
-unique_taxas_subtype <- unique_taxa(pseq.rel.f, treatment = "subtype")
-list_ASV_subtype_uniques <- data.frame(lapply(unique_taxas_subtype, "length<-", max(lengths(unique_taxas_subtype))))
-xlsx::write.xlsx(list_ASV_subtype_uniques, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "subtype_uniques", append = TRUE)
-
-unique_taxas_feature.type <- unique_taxa(pseq.rel.f, treatment = "feature.type")
-list_ASV_feature.type_uniques <- data.frame(lapply(unique_taxas_feature.type, "length<-", max(lengths(unique_taxas_feature.type))))
-xlsx::write.xlsx(list_ASV_feature.type_uniques, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "feature.type_uniques", append = TRUE)
-
-list_common <- common_taxa(pseq.rel.f, treatment = "subtype", subset = NULL, n = 'all')
-xlsx::write.xlsx(list_common, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "common_ASV", append = TRUE)
-
-plot(venn(list_core_subtype), fills = mycols_subtype)
-plot(venn(list_core_feature.type), fills = mycols_feature.type) #cant compute more than 5 groups
-
-## ASV more than 5% of abundance and present in at leats a 50% of samples ----
-
-list_core_subtype_restriction <- c() # an empty object to store information
-
-for (n in group_subtype){ # for each variable n in DiseaseState
-  ps.sub <- subset_samples(pseq.rel.f, subtype == n) # Choose sample from DiseaseState by n
-  core_m <- core_members(ps.sub, # ps.sub is phyloseq selected with only samples from g 
-                         detection = 0.05, # this could include the minimal abundance of the sample, if compositional, from 0 to 1 
-                         prevalence = 0.1) #the presence in at least a 10% of samples 10/100
-  print(paste0("No. of core taxa in ", n, " : ", length(core_m))) # print core taxa identified in each DiseaseState.
-  list_core_subtype_restriction[[n]] <- core_m
-} # add to a list core taxa for each group.
-
-print(list_core_subtype_restriction)
-
-list_ASV_subtype_restriction <- do.call(qpcR:::cbind.na, list_core_subtype_restriction)
-xlsx::write.xlsx(list_ASV_subtype_restriction, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "subtype_restriction", append = TRUE)
-
-plot(venn(list_core_subtype_restriction), fills = mycols_subtype)
-
-## Easier way to make venn diagram, however, cant extract ASV info for each group, thats why the previouly was performed ----
-venn <- ps_venn(pseq.rel, "subtype", fill =c("AD" ="#FF0000", "NORMAL" = "#32CD32", "SCLC" = "#008B8B", "SQ" ="#00008B"))
-
-## pie chart, with percentages of ASV shared with ----
-
-ps_upset <- read.delim("PQ00193_FFPE_LC/ASV_percent.txt", sep = "\t", header = T)
-ps_upset$Group <- factor(ps_upset$Group, levels = c("Normal", "SCLC", "AD", "SQ"))
-ps_upset$Feature <- factor (ps_upset$Feature, levels = c("Unique AD", "Unique SQ", "Unique SCLC", "Shared in Lung cancer", "Normal in Lung cancer"))
-
-detach(package:plyr)    
-library(dplyr)
-
-ps_upset2 <- ps_upset %>%                                    # Calculate percentage by group
-  group_by(Group) %>%
-  mutate(perc = Count / sum(Count)) %>% 
-  as.data.frame()
-
-colors_features <- c("Unique AD" = "#FF0000",
-                     "Unique SQ" = "#00008B",
-                     "Unique SCLC" = "#008B8B",
-                     "Normal in Lung cancer" = "#32CD32",
-                     "Shared in Lung cancer" = "gold")
-
-ASV_plot_nor_SCLC_AD_SQ <- ggplot(ps_upset2, aes(x = 1, y = Count, fill = Feature)) +  
-  geom_bar(stat="identity", position="fill", alpha = 0.5) +
-  geom_text(aes(label = ifelse(percents >= 0, paste0(scales::percent(percents)), "")),
-        stat = "identity", position = position_fill(vjust=0.5), size = 3.5) +
-  theme_bw() +
-  theme(aspect.ratio = 3.5, 
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        strip.text.x = element_text(size = 12), 
-        legend.position = "right",
-        legend.key = element_blank(),
-        panel.grid  = element_blank()) +
-  facet_wrap(~Group, ncol = 4) +
-  ylab("") +
-  xlab("") +
-  scale_fill_manual(values = colors_features)
-  
-ASV_plot_nor_SCLC_AD_SQ
-
-ggsave(filename = "ASV_plot_nor_SCLC_AD_SQ.svg", path = "PQ00193_FFPE_LC/ASV_plot/", plot = ASV_plot_nor_SCLC_AD_SQ, device = "svg", height = 6, width = 6, dpi = 300)
-
-ASV_plot_nor_AD <- ggplot(subset(ps_upset2, Group %in% c("Normal", "AD")), aes(x = 1, y = Count, fill = Feature)) +  
-  geom_bar(stat="identity", position="fill", alpha = 0.5) +
-  geom_text(aes(label = ifelse(perc >= 0, paste0(scales::percent(perc)), "")),
-            stat = "identity", position = position_fill(vjust=0.5), size = 3) +
-  theme_bw() +
-  theme(aspect.ratio = 2.5, 
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        strip.text.x = element_text(size = 9), 
-        legend.text = element_text(size = 8),
-        legend.position = "right",
-        legend.key = element_blank(),
-        panel.grid  = element_blank()) +
-  facet_wrap(~Group, ncol = 2) +
-  ylab("") +
-  xlab("") +
-  scale_fill_manual(values = colors_features)
-
-ASV_plot_nor_AD
-
-ggsave(filename = "ASV_plot_nor_AD.svg", path = "PQ00193_FFPE_LC/ASV_plot/", plot = ASV_plot_nor_AD, device = svg, height = 3.5, width = 3.5, dpi = 300)
-
-ASV_plot_nor_SQ <- ggplot(subset(ps_upset2, Group %in% c("Normal", "SQ")), aes(x = 1, y = Count, fill = Feature)) +  
-  geom_bar(stat="identity", position="fill", alpha = 0.5) +
-  geom_text(aes(label = ifelse(percents >= 0, paste0(scales::percent(percents)), "")),
-            stat = "identity", position = position_fill(vjust=0.5), size = 3.5) +
-  theme_bw() +
-  theme(aspect.ratio = 3.5, 
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        strip.text.x = element_text(size = 12), 
-        legend.position = "right",
-        legend.key = element_blank(),
-        panel.grid  = element_blank()) +
-  facet_wrap(~Group, ncol = 4) +
-  ylab("") +
-  xlab("") +
-  scale_fill_manual(values = colors_features)
-
-ASV_plot_nor_SQ
-
-ggsave(filename = "ASV_plot_nor_SQ.svg", path = "PQ00193_FFPE_LC/ASV_plot/", plot = ASV_plot_nor_SQ, device = "svg", height = 6, width = 6, dpi = 300)
-
-ASV_plot_nor_SCLC <- ggplot(subset(ps_upset2, Group %in% c("Normal", "SCLC")), aes(x = 1, y = Count, fill = Feature)) +  
-  geom_bar(stat="identity", position="fill", alpha = 0.5) +
-  geom_text(aes(label = ifelse(percents >= 0, paste0(scales::percent(percents)), "")),
-            stat = "identity", position = position_fill(vjust=0.5), size = 3.5) +
-  theme_bw() +
-  theme(aspect.ratio = 3.5, 
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        strip.text.x = element_text(size = 12), 
-        legend.position = "right",
-        legend.key = element_blank(),
-        panel.grid  = element_blank()) +
-  facet_wrap(~Group, ncol = 4) +
-  ylab("") +
-  xlab("") +
-  scale_fill_manual(values = colors_features)
-
-ASV_plot_nor_SCLC
-
-ggsave(filename = "ASV_plot_nor_SCLC.svg", path = "PQ00193_FFPE_LC/ASV_plot/", plot = ASV_plot_nor_SCLC, device = "svg", height = 6, width = 6, dpi = 300)
-
-ASV_plot_nor_ADSQ <- ggplot(subset(ps_upset2, Group %in% c("Normal", "AD", "SQ")), aes(x = 1, y = Count, fill = Feature)) +  
-  geom_bar(stat="identity", position="fill", alpha = 0.5) +
-  geom_text(aes(label = ifelse(percents >= 0, paste0(scales::percent(percents)), "")),
-            stat = "identity", position = position_fill(vjust=0.5), size = 3.5) +
-  theme_bw() +
-  theme(aspect.ratio = 3.5, 
-        axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        strip.text.x = element_text(size = 12), 
-        legend.position = "right",
-        legend.key = element_blank(),
-        panel.grid  = element_blank()) +
-  facet_wrap(~Group, ncol = 4) +
-  ylab("") +
-  xlab("") +
-  scale_fill_manual(values = colors_features)
-
-ASV_plot_nor_ADSQ
-
-ggsave(filename = "ASV_plot_nor_ADSQ.svg", path = "PQ00193_FFPE_LC/ASV_plot/", plot = ASV_plot_nor_ADSQ, device = "svg", height = 6, width = 6, dpi = 300)
-
-
-# Venn diagrams ----
-
-ps_ADnor <- readRDS("PQ00193_FFPE_LC/phyloseq_obj/ps_fADnor.rds") 
-ps_fADnor <- prune_samples(sample_sums(ps_ADnor) > 1000, ps_ADnor) 
-with(sample_data(ps_fADnor), table(subtype))
-
-pseq.rel <- microbiome::transform(ps_fADnor, "compositional")
-group_subtype <- unique(as.character(meta(pseq.rel)$subtype))
-print(group_subtype)
-
-pseq.rel.f <- format_to_besthit(pseq.rel)
-taxa_names(pseq.rel.f)[1:5]
-
-## ASV more than 0 of abundance (presence/absence) and present in at leats 1 sample ----
-
-list_core_subtype <- c() # an empty object to store information
-
-for (n in group_subtype){ # for each variable n in DiseaseState
-  ps.sub <- subset_samples(pseq.rel.f, subtype == n) # Choose sample from DiseaseState by n
-  core_m <- core_members(ps.sub, # ps.sub is phyloseq selected with only samples from g 
-                         detection = 0, 
-                         prevalence = 0) 
-  print(paste0("No. of core taxa in ", n, " : ", length(core_m))) # print core taxa identified in each DiseaseState.
-  list_core_subtype[[n]] <- core_m
-} # add to a list core taxa for each group.
-
-print(list_core_subtype)
-
-mycols_subtype <- c("AD" ="#FF0000", "NORMAL" = "#32CD32")
-
-list_ASV_subtype_all <- do.call(qpcR:::cbind.na, list_core_subtype)
-xlsx::write.xlsx(list_ASV_subtype_all, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "subtype_allshared")
-
-list_ASV_feature.type_all <- do.call(qpcR:::cbind.na, list_core_feature.type)
-xlsx::write.xlsx(list_ASV_feature.type_all, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "feature.type_allshared", append = TRUE)
-
-unique_taxas_subtype <- unique_taxa(pseq.rel.f, treatment = "subtype")
-list_ASV_subtype_uniques <- data.frame(lapply(unique_taxas_subtype, "length<-", max(lengths(unique_taxas_subtype))))
-xlsx::write.xlsx(list_ASV_subtype_uniques, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "subtype_uniques", append = TRUE)
-
-unique_taxas_feature.type <- unique_taxa(pseq.rel.f, treatment = "feature.type")
-list_ASV_feature.type_uniques <- data.frame(lapply(unique_taxas_feature.type, "length<-", max(lengths(unique_taxas_feature.type))))
-xlsx::write.xlsx(list_ASV_feature.type_uniques, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "feature.type_uniques", append = TRUE)
-
-list_common <- common_taxa(pseq.rel.f, treatment = "subtype", subset = NULL, n = 'all')
-xlsx::write.xlsx(list_common, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "common_ASV", append = TRUE)
-
-plot(venn(list_core_subtype), fills = mycols_subtype)
-
-
-## ASV more than 5% of abundance and present in at leats a 10% of samples ----
-
-list_core_subtype_restriction <- c() # an empty object to store information
-
-for (n in group_subtype){ # for each variable n in DiseaseState
-  ps.sub <- subset_samples(pseq.rel.f, subtype == n) # Choose sample from DiseaseState by n
-  core_m <- core_members(ps.sub, # ps.sub is phyloseq selected with only samples from g 
-                         detection = 0.05, # this could include the minimal abundance of the sample, if compositional, from 0 to 1 
-                         prevalence = 0.1) #the presence in at least a 10% of samples 10/100
-  print(paste0("No. of core taxa in ", n, " : ", length(core_m))) # print core taxa identified in each DiseaseState.
-  list_core_subtype_restriction[[n]] <- core_m
-} # add to a list core taxa for each group.
-
-print(list_core_subtype_restriction)
-
-list_ASV_subtype_restriction <- do.call(qpcR:::cbind.na, list_core_subtype_restriction)
-xlsx::write.xlsx(list_ASV_subtype_restriction, 'PQ00193_FFPE_LC/ASV_uniques.xlsx', sheetName = "subtype_restriction", append = TRUE)
-
-plot(venn(list_core_subtype_restriction), fills = mycols_subtype) 
+ps_fADSQ <- prune_samples(sample_sums(ps_ADSQ) > 1000, ps_ADSQ)
